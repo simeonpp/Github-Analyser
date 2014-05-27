@@ -40,7 +40,7 @@ public class gitNeo {
 	public static void main(String[] args) {
 		
 		gitNeo gitNeo = new gitNeo();
-//		gitNeo.createIndexes();
+		gitNeo.createIndexes();
 		gitNeo.authenticating();
 		gitNeo.addUserAndRepos();
 		
@@ -99,7 +99,7 @@ public class gitNeo {
 		// Authenticating in order to avoid API rate limit (5000 requests per hour)
 		//OAuth2 token authentication
 		GitHubClient client = new GitHubClient();
-		client.setOAuth2Token("094b156b9be686a7863f256a58e59740af958a85");
+		client.setOAuth2Token("");
 		
 	} // ***END*** authenticating method 
 	
@@ -109,6 +109,9 @@ public class gitNeo {
 	{		
 		        
 		System.out.println( "\n-------------------\nStarting database...\n-------------------" ); // notification
+		
+		// Node Limit Initialize
+		int nodeLimit = 50;
 		
 		// addData and relationships
         GraphDatabaseService db = new GraphDatabaseFactory().newEmbeddedDatabase( Neo4j_DBPath );
@@ -148,7 +151,7 @@ public class gitNeo {
             
             for(int i = 0; i < userNames.size(); i++) 
             {
-            	if (nodeCounter < 50000){
+            	if (nodeCounter < nodeLimit){
             		
             		// create User - Execution Engine to achieve MERGE
             		ExecutionEngine engine = new ExecutionEngine( db );
@@ -190,7 +193,7 @@ public class gitNeo {
     	            // Create Repositories Nodes and Relationship(s)
     	            for(int j = 0; j < userRepo.size(); j++)
     	            {
-    	            	if (nodeCounter < 50000){  // check if node limit is reached
+    	            	if (nodeCounter < nodeLimit){  // check if node limit is reached
     	            		
     	            		
     	            		// create Repositories - Execution Engine to achieve MERGE
