@@ -1,5 +1,5 @@
-package Tests;
-
+package GitHubAnalyser;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,7 +15,6 @@ import org.eclipse.egit.github.core.service.RepositoryService;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
@@ -24,11 +23,13 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.schema.IndexDefinition;
 import org.neo4j.graphdb.schema.Schema;
+import org.neo4j.kernel.impl.util.FileUtils;
 
 
-public class gitNeo {
+
+public class GitHubAnalyser {
 	
-	//	The Path of the Neo4j
+//	The Path of the Neo4j
 	private static final String Neo4j_DBPath = "C:/Users/Alpi/Documents/Neo4j/eclipse";
 	
 	
@@ -37,31 +38,64 @@ public class gitNeo {
 		MANAGE, HAS, CONTRIBUTED
 	}	
 	
-	// Initialize counter to check nodes number
-	private int nodeCounter = 0;
 	
-	// Node Limit Initialize
-	private int nodeLimit = 500;
-//	private int LimitGitHubUsers = 3;
-//	private int LimitUserRepos = 5;
-//	private int LimitContributes = 3;
-//	private int LimitContributersRepos = 5;
-	
-//	private int dbLevel = 5;
-	
+	/* 
+	 * Initialize main values
+	 * required by the Application
+	 */
+	private int nodeCounter = 0;					// Initialize counter to check nodes number
+	private int nodeLimit = 100;					// Node Limit Initialize
 	private String authToken = "a22ecd1b13fd684e0b5e018abe8a73d6290ef0f5";
 	
-
-	public static void main(String[] args) {
-		
-		gitNeo gitNeo = new gitNeo();
-		
-		gitNeo.createIndexes();
-		gitNeo.addUserAndRepos();
-		
-	}
-		
 	
+	/* 
+	 * Main method
+	 */
+	public static void main(String[] args) {
+
+		GitHubAnalyser exe = new GitHubAnalyser();
+		
+		/*
+		 * Main methods for running the application
+		 * Choose ONLY ONE
+		 */
+//		exe.coldStart();
+		exe.newFreshStart();
+//		exe.checkForUpdates();
+
+	} 	// ***END*** Main method 
+	
+	
+	
+	
+	private void coldStart() {
+		System.out.println("Cold Start Method Execution...\n");
+		createIndexes();										// create Neo4j Indexes
+		addData();												// create Nodes and Relationships
+	} 	// ***END*** coldStart method 
+	
+	
+	private void newFreshStart() {
+		System.out.println("New Fresh Start Method Execution...\n");	
+		removeData();											// delete all database records
+		createIndexes();										// create Neo4j Indexes
+		addData();												// create Nodes and Relationships
+	}	// ***END*** newFreshStart method 
+	
+	
+	private void checkForUpdates() {
+		System.out.println("Check For Updates Method Execution...\n");			
+	}	// ***END*** checkForUpdates method
+	
+	
+	
+	
+	
+	
+	
+	/*
+	 * Method for creating Indexes in Neo4j Database		*****************************************************************
+	 */
 	private void createIndexes() {
 		
 		System.out.println( "-------------------\nStarting database...\n-------------------\n" ); // notification
@@ -109,12 +143,19 @@ public class gitNeo {
  		db.shutdown();
  		System.out.println( "\n-------------------\nNoe4j database is shutdown!\n-------------------\n" );	// notification	
 		
-	}  // ***END*** createIndexes method 
-
+	}	/*
+	 	 *	***END*** createIndexes method 		***************************************************************** 
+	 	 */
 	
-
-
-	void addUserAndRepos()
+	
+	
+	/*
+	 * Method for creating Nodes
+	 * and Relationships amongst them
+	 * in Neo4j Database		
+	 * 											*****************************************************************
+	 */
+	void addData()
 	{		
 		     
 //		System.out.println( authenticating(clientName) );
@@ -161,7 +202,7 @@ public class gitNeo {
     		// -------------------------------------- LEVEL 2 --------------------------------------
     		
             // Create GitHub Users Nodes
-            ArrayList<String> userNames = new ArrayList<String>(Arrays.asList( "whhglyphs", "simeonpp" ) ); // "lovell", "divegeek", "richardsnee", "FortAwesome", "stephenhutchings", whhglyphs (bug)
+            ArrayList<String> userNames = new ArrayList<String>(Arrays.asList( "lovell", "simeonpp" ) ); // "lovell", "divegeek", "richardsnee", "FortAwesome", "stephenhutchings", whhglyphs (bug)
             
             for(int i = 0; i < userNames.size(); i++) 
             {
@@ -335,27 +376,27 @@ public class gitNeo {
 	                        		// -------------------------------------- END LEVEL 5 --------------------------------------
 	                	            	}
 	                	            	else {
-	                	            		System.out.println("Maximum Node limit reached! Contributor Repository " + userContrRepo.get(l) + " for Contributor " + contrUserNames.get(k) + " on Repository " + userRepo.get(j) + " for user " + userNames.get(i) + " was not created." ); // notification
+	                	            		System.out.println("Maximum Node limit of " + nodeLimit + " Nodes reached! Contributor Repository " + userContrRepo.get(l) + " for Contributor " + contrUserNames.get(k) + " on Repository " + userRepo.get(j) + " for user " + userNames.get(i) + " was not created." ); // notification
 	                	            	}// ***End if-ELSE loop (nodeCounter) (l)***
 	                	            }  // ***End for loop (l)*** 
 	                	            
 	                	         // -------------------------------------- END LEVEL 5 --------------------------------------
 	                        	}
 	                        	else {
-	                        		System.out.println("Maximum Node limit reached! Contributor " + contrUserNames.get(k) + " on Repository " + userRepo.get(j) + " for user " + userNames.get(i) + " was not created." ); // notification
+	                        		System.out.println("Maximum Node limit of " + nodeLimit + " Nodes reached! Contributor " + contrUserNames.get(k) + " on Repository " + userRepo.get(j) + " for user " + userNames.get(i) + " was not created." ); // notification
 	                        	} // ***End if-ELSE loop (nodeCounter) (k)***	                        		
 	                        }   // ***End for loop (k)***  
 	                        		
 	                     // -------------------------------------- END LEVEL 4 --------------------------------------
     	            	}
     	            	else {
-    	            		System.out.println("Maximum Node limit reached! Repository " + userRepo.get(j) + " for user " + userNames.get(i) + " was not created." ); // notification
+    	            		System.out.println("Maximum Node limit of " + nodeLimit + " Nodes reached! Repository " + userRepo.get(j) + " for user " + userNames.get(i) + " was not created." ); // notification
     	            	} // ***End if-ELSE loop (nodeCounter)***     	
     	            }   // ***End for loop (j)***          
     	         	
             	} // ***End if-ELSE loop (nodeCounter)*** 
             	else {
-            		System.out.println("Maximum Node limit reached! Username " + userNames.get(i) + " and his repositories were not created." ); // notification
+            		System.out.println("Maximum Node limit of " + nodeLimit + " Nodes reached! Username " + userNames.get(i) + " and his repositories were not created." ); // notification
             	} // ***End IF loop (nodeCounter)***
  
             }  // ***End for loop (i)*** 
@@ -370,11 +411,19 @@ public class gitNeo {
 		db.shutdown();
 		System.out.println( "\n-------------------\nNoe4j database is shutdown!\n-------------------" );	// notification		
 			
-	} // ***END*** addUserAndRepos method 
+	} 
+	/*
+ 	 *	***END*** addData method 		***************************************************************** 
+ 	 */
 	
 	
 	
-
+	/*
+	 * Method for creating repository from id.  The id is split on the '/' character and the
+	 * first two non-empty segments are interpreted to be the repository owner
+	 * and name.	
+	 * 									*****************************************************************
+	 */
 	private static IRepositoryIdProvider RepositoryId(String userId, String username, String repo) {
 		if (userId == null || userId.length() == 0)
 			return null;
@@ -392,6 +441,46 @@ public class gitNeo {
 
 		return owner != null && owner.length() > 0 && name != null
 				&& name.length() > 0 ? new RepositoryId(owner, name) : null;
-	} // ***END*** IRepositoryIdProvider method 
+	} 
+	/*
+ 	 *	***END*** IRepositoryIdProvider method 		***************************************************************** 
+ 	 */
+	
+	
+	/*
+	 * Method for deleting all data
+	 * The method deletes all files in Neo4j Path 
+	 * and deletes 'index' and 'schema' directories as well
+	 * 									*****************************************************************
+	 */
+	private void removeData() {
+		
+		System.out.println("Deleting Database...");	
+		
+		// delete all files in Neo4j Database Path
+		File file = new File(Neo4j_DBPath);        
+        String[] myFiles;      
+            if(file.isDirectory()){  
+                myFiles = file.list();  
+                for (int i=0; i<myFiles.length; i++) {  
+                    File myFile = new File(file, myFiles[i]);   
+                    myFile.delete();  
+                }  
+             } 
+           
+        // delete directories 'index' and 'schema' in Neo4j Database Path
+	    try {
+			FileUtils.deleteRecursively(new File(Neo4j_DBPath + "/index"));
+			FileUtils.deleteRecursively(new File(Neo4j_DBPath + "/schema"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	    
+	    System.out.println("The Database was successfuly deleted.\n");	// notification
+		
+	}
+	/*
+ 	 *	***END*** removeData method 		***************************************************************** 
+ 	 */
 
 }
