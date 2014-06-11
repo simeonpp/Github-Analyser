@@ -1,4 +1,4 @@
-package backUp;
+package backUpTREE;
 
 import java.util.ArrayList;
 
@@ -58,15 +58,6 @@ public class Variables {
 		
 		int integer = Integer.parseInt(string);      
         return integer;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	protected static boolean isNodeLimitReached() {
-		if ( nodeCounter < nodeLimit ) { return false;}
-		else { return true; }
 	}
 	
 }

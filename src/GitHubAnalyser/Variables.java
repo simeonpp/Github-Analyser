@@ -60,4 +60,13 @@ public class Variables {
         return integer;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
+	protected static boolean isNodeLimitReached() {
+		if ( nodeCounter < nodeLimit ) { return false;}
+		else { return true; }
+	}
+	
 }

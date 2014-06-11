@@ -16,8 +16,8 @@ public class gitHubAnalyser {
 //		run.createModuleNetwork();
 //		run.createCommitersNetwork();
 		
-//		run.SNA_ModuleNetwork();
-		run.SNA_CommitersNetwork();
+		run.SNA_ModuleNetwork();
+//		run.SNA_CommitersNetwork();
 		
 	} 	
 	
